@@ -35,4 +35,6 @@ return [
         ],
     ],
 
+    'api_secret_key' => env('API_SECRET_KEY'),
+
 ];

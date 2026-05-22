@@ -40,6 +40,17 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
+- The application uses SQLite (`database/database.sqlite`) as the default database.
+
+## Model Conventions
+
+- Use PHP attribute syntax for `$fillable` and `$hidden` — not array properties. See `app/Models/User.php`:
+  ```php
+  #[Fillable(['name', 'email', 'password'])]
+  #[Hidden(['password', 'remember_token'])]
+  class User extends Authenticatable
+  ```
+- Use `fake()` (not `$this->faker`) in factories, following `database/factories/UserFactory.php`.
 
 ## Frontend Bundling
 
