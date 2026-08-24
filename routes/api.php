@@ -26,6 +26,7 @@ Route::middleware('api.key')->group(function (): void {
     });
 
     // Orders (customer)
+    Route::post('/orders/quote', [OrderController::class, 'quote']);
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
