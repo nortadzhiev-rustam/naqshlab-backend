@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AdminMockupTemplateController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MockupController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +33,13 @@ Route::middleware('api.key')->group(function (): void {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 
+    // Mockups (public -- the studio is browsable without an account).
+    // Throttled because each miss costs a render.
+    Route::middleware('throttle:mockups')->group(function (): void {
+        Route::post('/mockups', [MockupController::class, 'store']);
+        Route::get('/mockups/{cacheKey}', [MockupController::class, 'show']);
+    });
+
     // Stripe webhook proxy (server-to-server, no user headers required)
     Route::patch('/orders/by-payment-intent/{intentId}', [OrderController::class, 'updateStatusByPaymentIntent']);
 
@@ -44,5 +53,14 @@ Route::middleware('api.key')->group(function (): void {
         Route::get('/stats', [AdminController::class, 'stats']);
         Route::get('/orders', [AdminController::class, 'orders']);
         Route::get('/orders/{id}', [AdminController::class, 'showOrder']);
+
+        // Mockup templates
+        Route::post('/mockup-templates/upload', [AdminMockupTemplateController::class, 'upload']);
+        Route::post('/mockup-templates/preview', [AdminMockupTemplateController::class, 'preview']);
+        Route::get('/mockup-templates', [AdminMockupTemplateController::class, 'index']);
+        Route::post('/mockup-templates', [AdminMockupTemplateController::class, 'store']);
+        Route::get('/mockup-templates/{id}', [AdminMockupTemplateController::class, 'show']);
+        Route::put('/mockup-templates/{id}', [AdminMockupTemplateController::class, 'update']);
+        Route::delete('/mockup-templates/{id}', [AdminMockupTemplateController::class, 'destroy']);
     });
 });

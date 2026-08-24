@@ -58,6 +58,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trusted Proxies
+    |--------------------------------------------------------------------------
+    |
+    | Every request reaches this API through the Next.js frontend, so without
+    | trusting it the real client IP is invisible and per-IP rate limits become
+    | one shared bucket for all customers. Accepts a comma-separated list of
+    | IPs or CIDR ranges, or "*". Empty trusts nothing, which is the safe
+    | default: a spoofed X-Forwarded-For would otherwise defeat the limit.
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mockup Rate Limit
+    |--------------------------------------------------------------------------
+    |
+    | Requests per minute per client for the mockup endpoints. Each miss costs
+    | a composite, so this is a cost control rather than an abuse control.
+    |
+    */
+
+    'mockup_rate_limit' => (int) env('MOCKUP_RATE_LIMIT', 60),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
