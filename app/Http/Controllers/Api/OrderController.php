@@ -246,7 +246,7 @@ class OrderController extends Controller
                 }
             }
 
-            $unitPrice = round((float) $product->base_price + (float) ($variant->price_modifier ?? 0), 2);
+            $unitPrice = round((float) $product->base_price + (float) ($variant?->price_modifier ?? 0), 2);
             $total += $unitPrice * $item['quantity'];
 
             if ($variant) {
