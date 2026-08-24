@@ -48,7 +48,9 @@ class AdminMockupTemplateController extends Controller
 
         $template = MockupTemplate::create($this->attributes($validated));
 
-        return (new MockupTemplateResource($template))->response()->setStatusCode(201);
+        // create() returns only the attributes that were set, so the column
+        // defaults for sort_order and is_active would serialise as null.
+        return (new MockupTemplateResource($template->refresh()))->response()->setStatusCode(201);
     }
 
     public function update(Request $request, string $id): MockupTemplateResource|JsonResponse

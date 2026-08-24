@@ -59,6 +59,9 @@ class AdminMockupTemplateTest extends TestCase
             ->assertJsonPath('printArea.quad.0.0', 300)
             ->assertJsonPath('displacementScale', 12);
 
+        // Column defaults must survive into the response, not come back null.
+        $response->assertJsonPath('isActive', true)->assertJsonPath('sortOrder', 0);
+
         $this->assertSame(1, MockupTemplate::count());
     }
 
