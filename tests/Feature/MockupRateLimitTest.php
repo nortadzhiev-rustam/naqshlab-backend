@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
@@ -27,26 +28,27 @@ class MockupRateLimitTest extends TestCase
     protected function tearDown(): void
     {
         TrustProxies::at([]);
-        putenv('TRUSTED_PROXIES');
-        unset($_ENV['TRUSTED_PROXIES']);
 
         parent::tearDown();
     }
 
+    /**
+     * Drives the provider through config rather than the environment: reading
+     * TRUSTED_PROXIES from .env would make these tests pass or fail depending
+     * on the machine they run on.
+     */
     private function bootWithTrustedProxies(?string $value): void
     {
-        if ($value === null) {
-            putenv('TRUSTED_PROXIES');
-            unset($_ENV['TRUSTED_PROXIES']);
-        } else {
-            putenv("TRUSTED_PROXIES={$value}");
-            $_ENV['TRUSTED_PROXIES'] = $value;
-        }
-
         // A refreshed application opens a new :memory: connection, so the
         // schema RefreshDatabase built in setUp is gone with the old one.
         $this->refreshApplication();
         Artisan::call('migrate', ['--force' => true]);
+
+        // The list is held statically, so clear whatever the boot just set.
+        TrustProxies::at([]);
+        config(['app.trusted_proxies' => $value]);
+
+        (new AppServiceProvider($this->app))->boot();
     }
 
     private function poll(string $clientIp)
