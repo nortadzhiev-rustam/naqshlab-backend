@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MockupController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,13 @@ Route::middleware('api.key')->group(function (): void {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
+
+    // Mockups (public -- the studio is browsable without an account).
+    // Throttled because each miss costs a render.
+    Route::middleware('throttle:60,1')->group(function (): void {
+        Route::post('/mockups', [MockupController::class, 'store']);
+        Route::get('/mockups/{cacheKey}', [MockupController::class, 'show']);
+    });
 
     // Stripe webhook proxy (server-to-server, no user headers required)
     Route::patch('/orders/by-payment-intent/{intentId}', [OrderController::class, 'updateStatusByPaymentIntent']);
