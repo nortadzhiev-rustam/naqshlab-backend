@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\MockupTemplate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
 use ImagickPixel;
@@ -232,7 +233,8 @@ class MockupComposer
     private function open(string $absolutePath): Imagick
     {
         if (! is_file($absolutePath)) {
-            throw new RuntimeException("Mockup template asset missing: {$absolutePath}");
+            Log::error('Mockup template asset missing.', ['path' => $absolutePath]);
+            throw new RuntimeException("Mockup template asset missing: {$relative}");
         }
 
         $image = new Imagick($absolutePath);

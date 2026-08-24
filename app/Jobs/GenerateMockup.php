@@ -7,6 +7,7 @@ use App\Models\Mockup;
 use App\Services\MockupComposer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
@@ -41,7 +42,9 @@ class GenerateMockup implements ShouldQueue
         );
 
         $path = "mockups/{$mockup->cache_key}.webp";
-        Storage::disk('public')->put($path, $result['contents']);
+        if (! Storage::disk('public')->put($path, $result['contents'])) {
+            throw new RuntimeException('Unable to store the rendered mockup.');
+        }
 
         $mockup->update([
             'path' => $path,
@@ -54,9 +57,14 @@ class GenerateMockup implements ShouldQueue
 
     public function failed(Throwable $e): void
     {
+        Log::error('Mockup generation failed.', [
+            'mockup_id' => $this->mockupId,
+            'exception' => $e,
+        ]);
+
         Mockup::whereKey($this->mockupId)->update([
             'status' => MockupStatus::Failed,
-            'failure_reason' => $e->getMessage(),
+            'failure_reason' => 'Mockup rendering failed.',
         ]);
     }
 }

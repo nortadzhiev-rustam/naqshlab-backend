@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Throwable;
@@ -151,7 +152,9 @@ class AdminMockupTemplateController extends Controller
         try {
             $result = (new MockupComposer)->render($design, $template);
         } catch (Throwable $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+            Log::error('Mockup preview failed.', ['exception' => $e]);
+
+            return response()->json(['message' => 'Unable to render the mockup preview.'], 422);
         }
 
         return response()->json([

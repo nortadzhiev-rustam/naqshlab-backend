@@ -21,6 +21,10 @@ class MockupController extends Controller
     /** Roughly 8 MB of artwork once base64 is decoded. */
     private const MAX_DESIGN_BYTES = 8_388_608;
 
+    private const MAX_DESIGN_PIXELS = 25_000_000;
+
+    private const MAX_DESIGN_DIMENSION = 10_000;
+
     /**
      * Queue a mockup of this artwork on every template that applies to the
      * product. Identical artwork on the same template is rendered once and
@@ -39,7 +43,7 @@ class MockupController extends Controller
             'productId' => ['nullable', 'string', 'exists:products,id'],
             'category' => ['nullable', 'string'],
             'templateIds' => ['nullable', 'array'],
-            'templateIds.*' => ['string'],
+            'templateIds.*' => ['string', 'distinct', 'exists:mockup_templates,id'],
         ]);
 
         $design = $this->decodeDesign($validated['design']);
@@ -119,9 +123,23 @@ class MockupController extends Controller
             ]);
         }
 
-        if (@getimagesizefromstring($decoded) === false) {
+        $size = @getimagesizefromstring($decoded);
+
+        if ($size === false) {
             throw ValidationException::withMessages([
                 'design' => 'The design must be a valid image.',
+            ]);
+        }
+
+        [$width, $height] = $size;
+
+        if (
+            $width > self::MAX_DESIGN_DIMENSION
+            || $height > self::MAX_DESIGN_DIMENSION
+            || $width * $height > self::MAX_DESIGN_PIXELS
+        ) {
+            throw ValidationException::withMessages([
+                'design' => 'The design dimensions are too large to render.',
             ]);
         }
 
