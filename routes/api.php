@@ -35,7 +35,7 @@ Route::middleware('api.key')->group(function (): void {
 
     // Mockups (public -- the studio is browsable without an account).
     // Throttled because each miss costs a render.
-    Route::middleware('throttle:60,1')->group(function (): void {
+    Route::middleware('throttle:mockups')->group(function (): void {
         Route::post('/mockups', [MockupController::class, 'store']);
         Route::get('/mockups/{cacheKey}', [MockupController::class, 'show']);
     });
