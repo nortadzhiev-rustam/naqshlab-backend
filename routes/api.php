@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AdminMockupTemplateController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MockupController;
 use App\Http\Controllers\Api\OrderController;
@@ -52,5 +53,14 @@ Route::middleware('api.key')->group(function (): void {
         Route::get('/stats', [AdminController::class, 'stats']);
         Route::get('/orders', [AdminController::class, 'orders']);
         Route::get('/orders/{id}', [AdminController::class, 'showOrder']);
+
+        // Mockup templates
+        Route::post('/mockup-templates/upload', [AdminMockupTemplateController::class, 'upload']);
+        Route::post('/mockup-templates/preview', [AdminMockupTemplateController::class, 'preview']);
+        Route::get('/mockup-templates', [AdminMockupTemplateController::class, 'index']);
+        Route::post('/mockup-templates', [AdminMockupTemplateController::class, 'store']);
+        Route::get('/mockup-templates/{id}', [AdminMockupTemplateController::class, 'show']);
+        Route::put('/mockup-templates/{id}', [AdminMockupTemplateController::class, 'update']);
+        Route::delete('/mockup-templates/{id}', [AdminMockupTemplateController::class, 'destroy']);
     });
 });
